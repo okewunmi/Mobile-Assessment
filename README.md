@@ -1,29 +1,41 @@
-# Welcome to your Expo app 👋
+# Welcome to the Live Location Tracking App 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## Get Started After Cloning the Repo
 
-1. Install dependencies
+1. **Install dependencies**
+
+   In your project directory, run the following command to install the required dependencies:
 
    ```bash
    npm install
-   ```
 
-2. Start the app
+2. **Start the app**
+
+   To run the app on your local machine, use the following command:
 
    ```bash
-    npx expo start
-   ```
+   npx expo start -c 
 
-In the output, you'll find options to open the app in a
+- This will start the Expo development server, and a QR code will be displayed in your code editor (e.g., VS Code).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+3. **Run the app using Expo Go**
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   -For Android:
+
+   Download the Expo Go app from the Google Play Store.
+   Open the Expo Go app and scan the QR code displayed in your code editor. This will launch the app on your Android device.
+
+   -For iOS:
+
+   Download the Expo Go app from the Apple App Store.
+   Open the Expo Go app and scan the QR code displayed in your code editor. This will launch the app on your iOS device.
+
+4. **Troubleshooting:**
+
+   If you encounter any issues, try restarting the Expo server or resetting the app using the steps below.
+
 
 ## Get a fresh project
 
