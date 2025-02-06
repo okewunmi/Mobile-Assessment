@@ -39,6 +39,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 # Appwrite was used for the backend
 
 
+
 ## Get a fresh project
 
 When you're ready, run:
