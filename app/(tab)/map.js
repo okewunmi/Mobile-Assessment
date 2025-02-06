@@ -1,71 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
-import {getCoord} from '../../lib/appwrite'
 
-const Home = () => {
-    const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
- 
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { fetchLatestCoord } from '../../lib/appwrite';
+
+const getAddressFromCoords = async (latitude, longitude) => {
+  const API_KEY = "AIzaSyAvDxKai74FhBvV145uYWif-O_IOe4EZR0";
+  // const API_KEY = "AIzaSyDKqPU_I4U0CDznIotEnvx5WHu7B86YDkQ";
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Geocoding API Response:", data); // Debugging log
+    if (data.results.length > 0) {
+      return data.results[0].formatted_address; // Get full address
+    }
+  } catch (error) {
+    console.error("Google Geocoding Error:", error);
+  }
+  return null;
+};
+
+const Profile = () => {
+  const [coord, setCoord] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    const updateBackend = async (coords) => {
-      setIsSubmitting(true);
+    const getCoordinates = async () => {
       try {
-        console.log("Updating backend with coords:", coords); // Debugging log
-        const result = await getCoord(coords.latitude, coords.longitude);
-        console.log("Coord saved result:", result); // Debugging log
-        return result;
-      } catch (error) {
-        Alert.alert("Saving location failed", error.message || "An error occurred.");
+        const latestCoord = await fetchLatestCoord();
+        if (latestCoord) {
+          setCoord(latestCoord);
+          const address = await getAddressFromCoords(latestCoord.latitude, latestCoord.longitude);
+          setAddress(address);
+        } else {
+          setError("No coordinates found.");
+        }
+      } catch (err) {
+        setError(err.message || "Failed to fetch location.");
       } finally {
-        setIsSubmitting(false);
+        setLoading(false);
       }
     };
 
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      Location.watchPositionAsync(
-  { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
-  (loc) => {
-    console.log("Location Updated:", loc.coords); // Debugging log
-    setLocation(loc.coords);
-    updateBackend(loc.coords);
-  }
-);
-    })();
+    getCoordinates();
   }, []);
 
   return (
-    <View style={styles.container}>
-      {location ? (
-        <MapView
-          style={styles.map}
-          initialRegion={{
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-        >
-          <Marker coordinate={location} title="Your Location" />
-        </MapView>
-      ) : (
-        <Text>{errorMsg || 'Fetching location...'}</Text>
-      )}
-    </View>
+    <SafeAreaView style={styles.safe}>
+      <View>
+        <Text style={styles.txt}>Your Current Location:</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : error ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : (
+          <>
+            <Text style={styles.txt}>Lat: {coord?.latitude}</Text>
+            <Text style={styles.txt}>Lng: {coord?.longitude}</Text>
+            {address && <Text style={styles.txt}>Address: {address}</Text>}
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   );
-}
+};
 
-export default Home;
+export default Profile;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  map: { width: '100%', height: '100%' },
+  safe: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  txt: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    fontSize: 16,
+  },
 });
