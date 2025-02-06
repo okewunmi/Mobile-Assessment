@@ -36,6 +36,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    If you encounter any issues, try restarting the Expo server or resetting the app using the steps below.
 
+# Appwrite was used for the backend
+
+
 
 ## Get a fresh project
 
